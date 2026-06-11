@@ -35,6 +35,7 @@ const esc = s => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').repl
 function card(t) {
   const paused = t.status === 'paused';
   const active = t.status === 'in_progress';
+  const done   = t.status === 'done';
 
   let actions = '';
   if (t.status === 'todo' || paused) {
@@ -52,16 +53,26 @@ function card(t) {
       <button class="btn-act del"   onclick="deleteTicket(${t.id})">&#10005; Delete</button>`;
   }
 
+  const notesHtml = done && t.notes
+    ? `<div class="ticket-notes"><span class="notes-label">&#x1F916; AI notes</span>${esc(t.notes)}</div>`
+    : '';
+
+  const progressHtml = active
+    ? `<div class="ticket-progress"><span class="spinner-sm"></span> AI working&hellip;</div>`
+    : '';
+
   return `
-    <div class="ticket">
+    <div class="ticket ${done ? 'ticket-done' : ''}">
       <div class="ticket-top">
         <span class="ticket-id">#${t.id}</span>
         <span class="pbadge ${t.priority}">${t.priority.toUpperCase()}</span>
       </div>
       <div class="ticket-title">${esc(t.title)}</div>
       ${paused ? `<span class="paused-tag">&#9646;&#9646; PAUSED &mdash; waiting for usage reset</span>` : ''}
+      ${progressHtml}
       ${t.working_directory ? `<div class="ticket-dir">&#128193; ${esc(t.working_directory)}</div>` : ''}
       ${t.description ? `<div class="ticket-desc">${esc(t.description)}</div>` : ''}
+      ${notesHtml}
       <div class="ticket-actions">${actions}</div>
     </div>`;
 }

@@ -12,10 +12,16 @@ db.exec(`
     priority TEXT DEFAULT 'mid' CHECK(priority IN ('high','mid','low')),
     status TEXT DEFAULT 'todo' CHECK(status IN ('todo','in_progress','done','paused','cancelled')),
     working_directory TEXT DEFAULT '',
+    notes TEXT DEFAULT '',
     created_at TEXT DEFAULT (datetime('now')),
     updated_at TEXT DEFAULT (datetime('now'))
   )
 `);
+
+// migrate existing DBs that don't have the notes column yet
+try {
+  db.exec(`ALTER TABLE tickets ADD COLUMN notes TEXT DEFAULT ''`);
+} catch (_) { /* column already exists */ }
 
 const PRIORITY_SQL = `CASE priority WHEN 'high' THEN 1 WHEN 'mid' THEN 2 WHEN 'low' THEN 3 END`;
 
@@ -43,7 +49,7 @@ module.exports = {
     return this.getById(r.lastInsertRowid);
   },
   update(id, data) {
-    const allowed = ['title', 'description', 'priority', 'status', 'working_directory'];
+    const allowed = ['title', 'description', 'priority', 'status', 'working_directory', 'notes'];
     const fields = Object.keys(data).filter(k => allowed.includes(k));
     if (!fields.length) return this.getById(id);
     const sets = [...fields.map(f => `${f} = ?`), `updated_at = datetime('now')`].join(', ');
