@@ -1,8 +1,8 @@
-# AIJira
+# TaskRelay
 
 An autonomous task manager for Claude Code. Create tickets, assign them to projects, and let the AI skill work through the queue while you focus on other things.
 
-![AIJira Board](https://img.shields.io/badge/stack-Node.js%20%2B%20SQLite-339933?style=flat-square&logo=node.js)
+![Stack](https://img.shields.io/badge/stack-Node.js%20%2B%20SQLite-339933?style=flat-square&logo=node.js)
 ![Docker](https://img.shields.io/badge/deploy-Docker-2496ED?style=flat-square&logo=docker)
 ![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)
 
@@ -10,7 +10,7 @@ An autonomous task manager for Claude Code. Create tickets, assign them to proje
 
 ## What It Does
 
-AIJira is a lightweight kanban board built specifically for Claude Code autonomous execution. Tickets sit in a queue ordered by priority. The companion skill picks them up one by one, executes each task using Claude Code tools (Read, Edit, Write, Bash, etc.), marks them done with an AI-written summary, then moves to the next — all without human intervention.
+TaskRelay is a lightweight kanban board built specifically for Claude Code autonomous execution. Tickets sit in a queue ordered by priority. The companion skill picks them up one by one, executes each task using Claude Code tools (Read, Edit, Write, Bash, etc.), marks them done with an AI-written summary, then moves to the next — all without human intervention.
 
 **Key features:**
 
@@ -45,8 +45,8 @@ AIJira is a lightweight kanban board built specifically for Claude Code autonomo
 ### Run with Docker Compose
 
 ```bash
-git clone <this-repo>
-cd AIJira
+git clone https://github.com/NexusLayerEU/taskrelay
+cd taskrelay
 docker compose up -d
 ```
 
@@ -57,12 +57,12 @@ The UI will be available at **http://localhost:4010**.
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `PORT` | `4010` | Port the server listens on |
-| `DB_PATH` | `/app/data/aijira.db` | Path to the SQLite database |
+| `DB_PATH` | `/app/data/taskrelay.db` | Path to the SQLite database |
 
-The database is persisted in a named Docker volume (`aijira_data`). To back it up:
+The database is persisted in a named Docker volume (`taskrelay_data`). To back it up:
 
 ```bash
-docker cp aijira:/app/data/aijira.db ./backup.db
+docker cp taskrelay:/app/data/taskrelay.db ./backup.db
 ```
 
 ---
@@ -117,13 +117,13 @@ curl -X PUT http://localhost:4010/api/tickets/5 \
 **Create project body:**
 ```json
 {
-  "name": "GreekDesire",
+  "name": "MyApp",
   "color": "#3b82f6",
   "type": "existing",
-  "description": "Dating platform",
-  "location": "greekdesire",
+  "description": "Short description",
+  "location": "myapp",
   "tech_stack": "Next.js, PostgreSQL, Docker",
-  "notes": "Main API is at /api/v2. Always run migrations before deploying."
+  "notes": "Important context the AI should know before working on this project."
 }
 ```
 
@@ -139,7 +139,7 @@ curl -X PUT http://localhost:4010/api/tickets/5 \
 
 ---
 
-## The AIJira Skill
+## The TaskRelay Skill
 
 The skill makes Claude Code autonomously drain the ticket queue. Install it once and trigger it with a phrase.
 
@@ -148,37 +148,36 @@ The skill makes Claude Code autonomously drain the ticket queue. Install it once
 1. Copy `SKILL.md` into your Claude Code skills directory:
 
 ```bash
-mkdir -p ~/.claude/skills/aijira
-cp SKILL.md ~/.claude/skills/aijira/SKILL.md
+mkdir -p ~/.claude/skills/taskrelay
+cp SKILL.md ~/.claude/skills/taskrelay/SKILL.md
 ```
 
-2. If you use a custom skill loader (superpowers or similar), register it:
+2. Register it in your `~/.claude/CLAUDE.md` so Claude Code loads it automatically:
 
-```bash
-# In your ~/.claude/CLAUDE.md or skill registry, add a reference to:
-# ~/.claude/skills/aijira/SKILL.md
+```markdown
+@skills/taskrelay/SKILL.md
 ```
 
-3. **Update the endpoint URL** inside `SKILL.md` to match your server:
+3. **Update the endpoint URL** inside `SKILL.md` to point to your server:
 
 ```
-# Find this line and change the IP/port:
-GET http://192.168.68.111:4010/api/tickets/queue
+# Find and replace this line with your actual host/port:
+GET http://YOUR_SERVER_IP:4010/api/tickets/queue
 ```
 
 ### Trigger Phrases
 
 Start the skill by saying any of:
 
-- `Start work from AIJira`
-- `aijira start`
+- `Start work from TaskRelay`
+- `taskrelay start`
 - `work on tickets`
-- `/aijira`
+- `/taskrelay`
 
 Stop it with:
 
-- `stop working on aijira`
-- `stop aijira`
+- `stop working on taskrelay`
+- `stop taskrelay`
 
 ### What the Skill Does
 
@@ -193,17 +192,17 @@ Phase 4 → Mark done with AI-written summary notes
         → Loop back to Phase 1
 ```
 
-When usage hits 5%, the skill saves its position (marks ticket as `paused`) and schedules an automatic resume via `ScheduleWakeup` for after the reset window.
+When usage hits 5%, the skill marks the current ticket as `paused` and schedules an automatic resume via `ScheduleWakeup` for after the reset window. On resume the paused ticket surfaces first in the queue.
 
 ### Project Location Resolution
 
-The `location` field on a project (or `working_directory` on a ticket) can be:
+The `location` field on a project (or `working_directory` on a ticket) accepts:
 
 | Value | Behavior |
 |-------|----------|
-| `/Users/admin/Documents/Thomas-SRC/MyApp` | Used as-is |
-| `greekdesire` | Searched in `Thomas-SRC/` then `Profile-SRC/` |
-| `Thomas-SRC/NewApp` (with `type: new`) | Directory created at that path |
+| `/full/absolute/path` | Used as-is |
+| `myapp` | Searched in common source directories |
+| `ParentDir/NewApp` (with `type: new`) | Directory created at that path on first run |
 
 ---
 
@@ -251,7 +250,7 @@ The frontend is fully static — edit `public/app.js`, `public/style.css`, or `p
 ### Project Structure
 
 ```
-AIJira/
+taskrelay/
 ├── Dockerfile
 ├── docker-compose.yml
 ├── package.json
@@ -269,15 +268,13 @@ AIJira/
 ## Updating
 
 ```bash
-# Pull latest code to your server
+# Sync latest code to your server
 rsync -avz --exclude='.git' --exclude='node_modules' --exclude='*.db' \
-  ./ user@yourserver:/opt/aijira/
+  ./ user@yourserver:/opt/taskrelay/
 
-# Rebuild and restart (zero downtime on the volume)
-ssh user@yourserver "cd /opt/aijira && docker compose up --build -d"
+# Rebuild and restart (volume keeps the database intact)
+ssh user@yourserver "cd /opt/taskrelay && docker compose up --build -d"
 ```
-
-The SQLite volume is never touched during rebuilds.
 
 ---
 

@@ -56,4 +56,4 @@ app.delete('/api/projects/:id', (req, res) => {
 });
 
 const PORT = process.env.PORT || 4010;
-app.listen(PORT, '0.0.0.0', () => console.log(`AIJira running on :${PORT}`));
+app.listen(PORT, '0.0.0.0', () => console.log(`TaskRelay running on :${PORT}`));

@@ -1,7 +1,7 @@
 {
-  "name": "aijira",
+  "name": "taskrelay",
   "version": "1.0.0",
-  "description": "AI task queue for Claude Code autonomous work",
+  "description": "Autonomous AI task relay for Claude Code",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
