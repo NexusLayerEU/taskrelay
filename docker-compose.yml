@@ -1,0 +1,16 @@
+version: '3.8'
+services:
+  aijira:
+    build: .
+    container_name: aijira
+    ports:
+      - "4010:4010"
+    volumes:
+      - aijira_data:/app/data
+    environment:
+      - DB_PATH=/app/data/aijira.db
+      - PORT=4010
+    restart: unless-stopped
+
+volumes:
+  aijira_data:

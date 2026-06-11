@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AIJira</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div class="header-left">
+      <span class="logo">&#x1F916; AIJira</span>
+      <span class="subtitle">AI Task Manager</span>
+    </div>
+    <div class="header-right">
+      <span id="ai-status" class="ai-status idle">AI: Idle</span>
+      <button id="btn-new" class="btn-primary">+ New Ticket</button>
+    </div>
+  </header>
+
+  <main class="kanban">
+    <div class="column" id="col-todo">
+      <div class="col-header todo-header">
+        <span>TO DO</span>
+        <span class="col-count" id="count-todo">0</span>
+      </div>
+      <div class="cards" id="cards-todo"></div>
+    </div>
+    <div class="column" id="col-active">
+      <div class="col-header active-header">
+        <span>IN PROGRESS</span>
+        <span class="col-count" id="count-active">0</span>
+      </div>
+      <div class="cards" id="cards-active"></div>
+    </div>
+    <div class="column" id="col-done">
+      <div class="col-header done-header">
+        <span>DONE</span>
+        <span class="col-count" id="count-done">0</span>
+      </div>
+      <div class="cards" id="cards-done"></div>
+    </div>
+  </main>
+
+  <div id="modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>New Ticket</h2>
+        <button id="btn-close" class="btn-close">&times;</button>
+      </div>
+      <form id="ticket-form">
+        <div class="form-group">
+          <label>Title *</label>
+          <input type="text" id="f-title" placeholder="What needs to be done?" required>
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="f-desc" rows="5" placeholder="Describe the task in detail for the AI..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Priority</label>
+          <div class="priority-selector">
+            <label class="prio-opt">
+              <input type="radio" name="priority" value="high"> <span class="prio-label high">HIGH</span>
+            </label>
+            <label class="prio-opt">
+              <input type="radio" name="priority" value="mid" checked> <span class="prio-label mid">MID</span>
+            </label>
+            <label class="prio-opt">
+              <input type="radio" name="priority" value="low"> <span class="prio-label low">LOW</span>
+            </label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Working Directory (on AI machine)</label>
+          <input type="text" id="f-dir" placeholder="/Users/admin/Documents/Thomas-SRC/MyProject">
+          <small>Leave empty if no specific directory needed</small>
+        </div>
+        <div class="form-actions">
+          <button type="button" id="btn-cancel" class="btn-secondary">Cancel</button>
+          <button type="submit" class="btn-create">Create Ticket</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

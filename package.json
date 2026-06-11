@@ -1,0 +1,13 @@
+{
+  "name": "aijira",
+  "version": "1.0.0",
+  "description": "AI task queue for Claude Code autonomous work",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^9.4.3",
+    "express": "^4.18.3"
+  }
+}
